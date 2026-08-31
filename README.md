@@ -1,4 +1,4 @@
-#  User Management System
+# User Management System
 
 Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID prensiplerine uygun, katmanlı mimari (Layered Architecture) desenini benimseyen, Spring Boot, Oracle Database ve React tabanlı kurumsal bir Kullanıcı Yönetim Sistemi projesidir.
 
@@ -9,7 +9,7 @@ Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID 
 * **Dil:** Java 21 (LTS)
 * **Framework:** Spring Boot 3.2.x (Web, Validation)
 * **Derleme Aracı:** Apache Maven
-* **Mimari:** Domain-Driven Layered Architecture (IoC & DI)
+* **Mimari:** Domain-Driven Layered Architecture (IoC & DI, RESTful API)
 * **Sürüm Kontrolü:** Git & GitHub
 
 ---
@@ -52,32 +52,27 @@ Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID 
 * **Stereotype Anotasyonlar:** `@Component`, `@Service`, `@Repository` ve `@RestController` anotasyonlarının mimari katmanlardaki sorumlulukları ayrıştırıldı.
 * **Konfigürasyon & Ortam:** `application.properties` üzerinden sunucu portu (`server.port=8085`), log seviyeleri ve uygulama meta verileri özelleştirilerek Tomcat üzerinde ayağa kaldırıldı.
 
+### 🔹 Gün 7: Katmanlı Mimari (Layered Architecture), DTO Deseni ve REST Uçları
+* **Katmanlı Mimari İzolasyonu:** `Controller -> Service -> Repository -> Data` akışı kurularak her katmanın sorumluluğu kesin çizgilerle ayrıştırıldı.
+* **DTO Deseni & Güvenlik:** Over-posting saldırılarını ve veri sızıntısını önlemek için `UserRequestDto` ve `UserResponseDto` sınıfları modellendi; `UserEntity` dış dünyadan tamamen yalıtıldı.
+* **Constructor Injection Zinciri:** Controller'dan Repository'ye kadar tüm bağımlılıklar `private final` alanlar üzerinden gevşek bağlı (loose coupling) bağlandı.
+* **REST Endpoints:** `POST /api/users`, `GET /api/users/{id}` ve `GET /api/users` uç noktaları `ResponseEntity` ve Bean Validation (`@Valid`) standartlarıyla ayağa kaldırıldı.
+
 ---
 
-## Domain ve Sınıf Hiyerarşisi
+##  Mimari Katmanlar ve Sınıf Hiyerarşisi
 
-### 1. `User` Modeli (Builder Destekli)
-| Alan (Field) | Tip | Açıklama |
+### 1. DTO & Entity Veri Modeli
+| Katman / Sınıf | Sorumluluk Alanı | Validasyon / Güvenlik Kriteri |
 | :--- | :--- | :--- |
-| `id` | `Long` | Benzersiz Kayıt Kimliği (Primary Key) |
-| `ad` | `String` | Kullanıcı Adı |
-| `soyad` | `String` | Kullanıcı Soyadı |
-| `email` | `String` | Benzersiz E-posta Adresi |
-| `telefon` | `String` | İletişim Numarası |
-| `durum` | `Boolean` | Kullanıcı Durumu (Aktif / Pasif) |
-| `tarih` | `LocalDateTime` | Kayıt Oluşturulma Zamanı |
+| **`UserRequestDto`** | API İstek Şablonu | `@NotBlank`, `@Email`, `@Size` ile istemci girdi denetimi |
+| **`UserResponseDto`** | API Yanıt Şablonu | Hassas/teknik verilerden arındırılmış filtrelenmiş çıktı |
+| **`UserEntity`** | Veritabanı Yansıması | Persistence katmanına özel veri modeli |
 
-### 2. `Person` Kalıtım Ağacı & Tasarım Desenleri
-* **`Person` (Abstract Class):** `id`, `ad`, `soyad`, `email`, `telefon`
-  * ↳ **`Employee`:** `departman`, `maas`, `calis()`
-  * ↳ **`Customer`:** `musteriNumarasi`, `sadakatPuani`, `siparisVer()`
-  * ↳ **`Admin`:** `yetkiSeviyesi`, `kullaniciEngelle()`
-* **`AppConfig` (Singleton):** Uygulama genelinde tek instance garantisi.
-* **`UserFactory` (Factory):** Rol bazlı `Person` nesnesi üretim merkezi.
-
-### 3. Spring Boot Katmanları ve Bileşenleri
-* **`NotificationSender` (`@Component`):** Sistem genelinde e-posta/bildirim gönderimini üstlenen tekil bileşen.
-* **`UserManagerService` (`@Service`):** Kullanıcı iş kurallarını yöneten, `NotificationSender` bağımlılığını Constructor Injection ile alan servis katmanı.
-* **`UserManagementSystemApplication`:** `ApplicationContext` başlatan, bileşen taramasını (`@ComponentScan`) ve çalışma zamanı testlerini (`CommandLineRunner`) yöneten ana giriş noktası.
+### 2. Katmanlı Mimari Bileşenleri
+* **`UserController` (`@RestController`):** `/api/users` taban rotasında HTTP isteklerini karşılar ve HTTP durum kodlarını yönetir.
+* **`UserService` (`@Service`):** E-posta teillik kontrolü gibi iş mantığı kurallarını işletir, DTO-Entity eşlemelerini gerçekleştirir.
+* **`UserRepository` (`@Repository`):** In-memory `ConcurrentHashMap` üzerinden veri erişim operasyonlarını yürütür.
+* **`NotificationSender` (`@Component`):** Sistem içi asenkron bildirim gönderimlerini üstlenir.
 
 ---
