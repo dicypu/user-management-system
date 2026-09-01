@@ -1,44 +1,24 @@
 package repository;
 
 import entity.UserEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Repository
-public class UserRepository {
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
-    // Gerçek DB'ye geçene kadar thread-safe in-memory veritabanı simülasyonu
-    private final Map<Long, UserEntity> database = new ConcurrentHashMap<>();
-    private final AtomicLong idGenerator = new AtomicLong(1L);
+    // E-posta ile kullanıcı bulma
+    Optional<UserEntity> findByEmail(String email);
 
-    public UserEntity save(UserEntity entity) {
-        if (entity.getId() == null) {
-            entity.setId(idGenerator.getAndIncrement());
-        }
-        database.put(entity.getId(), entity);
-        return entity;
-    }
+    // E-posta sistemde var mı kontrolü (Performanslı varlık kontrolü)
+    boolean existsByEmail(String email);
 
-    public Optional<UserEntity> findById(Long id) {
-        return Optional.ofNullable(database.get(id));
-    }
+    // İsme göre büyük/küçük harf duyarsız arama
+    List<UserEntity> findByAdContainingIgnoreCase(String ad);
 
-    public List<UserEntity> findAll() {
-        return new ArrayList<>(database.values());
-    }
-
-    public boolean existsByEmail(String email) {
-        return database.values().stream()
-                .anyMatch(user -> user.getEmail().equalsIgnoreCase(email));
-    }
-
-    public boolean deleteById(Long id) {
-        return database.remove(id) != null;
-    }
+    // Sadece aktif/pasif kullanıcıları listeleme
+    List<UserEntity> findByDurum(Boolean durum);
 }

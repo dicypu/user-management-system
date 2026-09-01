@@ -1,21 +1,39 @@
 package entity;
 
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 /**
- * Veritabanı tablosunun birebir Java yansımasıdır.
- * Dış API katmanına ASLA doğrudan sunulmaz.
+ * JPA Entity: Hibernate bu sınıfı 'users' tablosuyla eşler.
  */
+@Entity
+@Table(name = "users")
 public class UserEntity {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", updatable = false, nullable = false)
     private Long id;
+
+    @Column(name = "ad", nullable = false, length = 50)
     private String ad;
+
+    @Column(name = "soyad", nullable = false, length = 50)
     private String soyad;
+
+    @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
+
+    @Column(name = "telefon", length = 20)
     private String telefon;
-    private Boolean durum;
+
+    @Column(name = "durum", nullable = false)
+    private Boolean durum = true;
+
+    @Column(name = "kayit_tarihi", nullable = false, updatable = false)
     private LocalDateTime tarih;
 
+    // Hibernate/JPA için parametresiz constructor zorunludur
     public UserEntity() {
     }
 
@@ -29,6 +47,17 @@ public class UserEntity {
         this.tarih = tarih;
     }
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.tarih == null) {
+            this.tarih = LocalDateTime.now();
+        }
+        if (this.durum == null) {
+            this.durum = true;
+        }
+    }
+
+    // Getters & Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getAd() { return ad; }

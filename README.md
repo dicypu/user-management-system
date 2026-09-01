@@ -1,15 +1,16 @@
 # User Management System
 
-Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID prensiplerine uygun, katmanlı mimari (Layered Architecture) desenini benimseyen, Spring Boot, Oracle Database ve React tabanlı kurumsal bir Kullanıcı Yönetim Sistemi projesidir.
+Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID prensiplerine uygun, katmanlı mimari (Layered Architecture) desenini benimseyen, Spring Boot, Spring Data JPA ve H2/Oracle Database tabanlı kurumsal bir Kullanıcı Yönetim Sistemi projesidir.
 
 ---
 
 ##  Teknoloji Yığını (Tech Stack)
 
 * **Dil:** Java 21 (LTS)
-* **Framework:** Spring Boot 3.2.x (Web, Validation)
+* **Framework:** Spring Boot 3.2.x (Web, Validation, Data JPA)
+* **ORM & Veritabanı:** Hibernate / JPA, H2 In-Memory Database (Oracle DB Hazırlığı)
 * **Derleme Aracı:** Apache Maven
-* **Mimari:** Domain-Driven Layered Architecture (IoC & DI, RESTful API)
+* **Mimari:** Domain-Driven Layered Architecture (IoC & DI, RESTful API, DTO Pattern)
 * **Sürüm Kontrolü:** Git & GitHub
 
 ---
@@ -58,6 +59,12 @@ Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID 
 * **Constructor Injection Zinciri:** Controller'dan Repository'ye kadar tüm bağımlılıklar `private final` alanlar üzerinden gevşek bağlı (loose coupling) bağlandı.
 * **REST Endpoints:** `POST /api/users`, `GET /api/users/{id}` ve `GET /api/users` uç noktaları `ResponseEntity` ve Bean Validation (`@Valid`) standartlarıyla ayağa kaldırıldı.
 
+### 🔹 Gün 8: ORM Mantığı, Hibernate/JPA ve Spring Data JPA Repository
+* **ORM & Hibernate Mimarisi:** JDBC karmaşıklığını ortadan kaldıran ORM felsefesi ve JPA şartnamesi ile Hibernate motorunun çalışma mekanizması analiz edildi.
+* **JPA Entity & Mapping:** `UserEntity` sınıfı `@Entity`, `@Table`, `@Id`, `@GeneratedValue` ve `@Column` anotasyonlarıyla ilişkisel veritabanı şemasına bağlandı.
+* **Spring Data JPA:** `UserRepository` arayüzü `JpaRepository<UserEntity, Long>` ile genişletilerek saf SQL yazmadan CRUD operasyonları devreye alındı.
+* **Derived Query Methods:** `findByEmail`, `existsByEmail` ve `findByAdContainingIgnoreCase` türetilmiş metotlarıyla dinamik SQL üretimi sağlandı; `/api/users/search` ucu ayağa kaldırıldı.
+
 ---
 
 ##  Mimari Katmanlar ve Sınıf Hiyerarşisi
@@ -67,12 +74,12 @@ Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID 
 | :--- | :--- | :--- |
 | **`UserRequestDto`** | API İstek Şablonu | `@NotBlank`, `@Email`, `@Size` ile istemci girdi denetimi |
 | **`UserResponseDto`** | API Yanıt Şablonu | Hassas/teknik verilerden arındırılmış filtrelenmiş çıktı |
-| **`UserEntity`** | Veritabanı Yansıması | Persistence katmanına özel veri modeli |
+| **`UserEntity`** | Veritabanı Yansıması | JPA `@Entity`, `@Table(name = "users")` ile Persistence eşlemesi |
 
 ### 2. Katmanlı Mimari Bileşenleri
-* **`UserController` (`@RestController`):** `/api/users` taban rotasında HTTP isteklerini karşılar ve HTTP durum kodlarını yönetir.
-* **`UserService` (`@Service`):** E-posta teillik kontrolü gibi iş mantığı kurallarını işletir, DTO-Entity eşlemelerini gerçekleştirir.
-* **`UserRepository` (`@Repository`):** In-memory `ConcurrentHashMap` üzerinden veri erişim operasyonlarını yürütür.
-* **`NotificationSender` (`@Component`):** Sistem içi asenkron bildirim gönderimlerini üstlenir.
+* **`UserController` (`@RestController`):** `/api/users` taban rotasında HTTP isteklerini karşılar, validasyonları denetler ve HTTP durum kodlarını yönetir.
+* **`UserService` (`@Service`):** `@Transactional` yönetimini üstlenir, iş kurallarını işletir, Entity-DTO dönüşümlerini sağlar.
+* **`UserRepository` (`@Repository`):** `JpaRepository` üzerinden H2/Oracle veritabanına otomatik SQL sorguları üreterek veri erişimini yönetir.
+* **`NotificationSender` (`@Component`):** Sistem içi e-posta ve bildirim operasyonlarını yürüten bağımsız bileşen.
 
 ---
