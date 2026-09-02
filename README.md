@@ -65,6 +65,10 @@ Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID 
 * **Spring Data JPA:** `UserRepository` arayüzü `JpaRepository<UserEntity, Long>` ile genişletilerek saf SQL yazmadan CRUD operasyonları devreye alındı.
 * **Derived Query Methods:** `findByEmail`, `existsByEmail` ve `findByAdContainingIgnoreCase` türetilmiş metotlarıyla dinamik SQL üretimi sağlandı; `/api/users/search` ucu ayağa kaldırıldı.
 
+### 🔹 Gün 9: Kurumsal Veritabanı Entegrasyonu (Oracle XE & Docker)
+* **Konteyner Mimarisi:** Oracle XE 21c (`gvenzl/oracle-xe:21-slim`) imajı Docker üzerinde `1521` portu ve `XEPDB1` Pluggable Database servisiyle izole edildi.
+* **JPA & Sequence Stratejisi:** Oracle'ın yerel sıralayıcı mekanizması olan `GenerationType.SEQUENCE` kurgulandı; Oracle rezerve anahtar sözcük çakışmalarını önlemek adına tablo adı `users` olarak yapılandırıldı.
+* **Uçtan Uca Doğrulama:** Spring Boot üzerinden fırlatılan REST kayıtları hem yerel konteyner CLI aracı `sqlplus` hem de Hibernate DDL-Auto izleme logları üzerinden fiziksel olarak doğrulandı.
 ---
 
 ##  Mimari Katmanlar ve Sınıf Hiyerarşisi

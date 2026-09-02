@@ -3,15 +3,17 @@ package entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-/**
- * JPA Entity: Hibernate bu sınıfı 'users' tablosuyla eşler.
- */
 @Entity
 @Table(name = "users")
 public class UserEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq_gen")
+    @SequenceGenerator(
+            name = "users_seq_gen",
+            sequenceName = "users_seq",
+            allocationSize = 1
+    )
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
 
@@ -33,7 +35,6 @@ public class UserEntity {
     @Column(name = "kayit_tarihi", nullable = false, updatable = false)
     private LocalDateTime tarih;
 
-    // Hibernate/JPA için parametresiz constructor zorunludur
     public UserEntity() {
     }
 
@@ -57,7 +58,7 @@ public class UserEntity {
         }
     }
 
-    // Getters & Setters
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getAd() { return ad; }
