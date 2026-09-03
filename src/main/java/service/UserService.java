@@ -21,43 +21,55 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDto createUser(UserRequestDto requestDto) {
-        if (userRepository.existsByEmail(requestDto.getEmail())) {
-            throw new IllegalArgumentException("Bu e-posta adresi (" + requestDto.getEmail() + ") sistemde zaten kayıtlı!");
-        }
-
+    public UserResponseDto createUser(UserRequestDto dto) {
         UserEntity entity = new UserEntity();
-        entity.setAd(requestDto.getAd());
-        entity.setSoyad(requestDto.getSoyad());
-        entity.setEmail(requestDto.getEmail());
-        entity.setTelefon(requestDto.getTelefon());
+        entity.setAd(dto.getAd());
+        entity.setSoyad(dto.getSoyad());
+        entity.setEmail(dto.getEmail());
+        entity.setTelefon(dto.getTelefon());
+        entity.setDurum(true);
 
-        UserEntity savedEntity = userRepository.save(entity);
-        return mapToResponseDto(savedEntity);
-    }
-
-    @Transactional(readOnly = true)
-    public UserResponseDto getUserById(Long id) {
-        UserEntity entity = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("ID'si " + id + " olan kullanıcı sistemde bulunamadı!"));
-        return mapToResponseDto(entity);
+        UserEntity saved = userRepository.save(entity);
+        return mapToDto(saved);
     }
 
     @Transactional(readOnly = true)
     public List<UserResponseDto> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(this::mapToResponseDto)
+                .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponseDto> searchUsersByName(String name) {
-        return userRepository.findByAdContainingIgnoreCase(name).stream()
-                .map(this::mapToResponseDto)
-                .collect(Collectors.toList());
+    public UserResponseDto getUserById(Long id) {
+        UserEntity entity = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("ID'si " + id + " olan kullanıcı bulunamadı."));
+        return mapToDto(entity);
     }
 
-    private UserResponseDto mapToResponseDto(UserEntity entity) {
+    @Transactional
+    public UserResponseDto updateUser(Long id, UserRequestDto dto) {
+        UserEntity entity = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Güncellenecek kullanıcı bulunamadı. ID: " + id));
+
+        entity.setAd(dto.getAd());
+        entity.setSoyad(dto.getSoyad());
+        entity.setEmail(dto.getEmail());
+        entity.setTelefon(dto.getTelefon());
+
+        UserEntity updated = userRepository.save(entity);
+        return mapToDto(updated);
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("Silinecek kullanıcı bulunamadı. ID: " + id);
+        }
+        userRepository.deleteById(id);
+    }
+
+    private UserResponseDto mapToDto(UserEntity entity) {
         return new UserResponseDto(
                 entity.getId(),
                 entity.getAd(),
