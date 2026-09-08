@@ -85,6 +85,13 @@ Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID 
 * **Fonksiyonel Bileşen (Function Component) Mimarisi:** Tek sorumluluk prensibine (SRP) sadık kalınarak `UserCard` bileşeni geliştirildi; arayüz mantığı modüler parçalara ayrıştırıldı.
 * **Props ile Tek Yönlü Veri Akışı (Unidirectional Data Flow):** Üst bileşenden (`App.jsx`) alt bileşene (`UserCard.jsx`) veri aktarımı salt okunur (read-only) `props` (`ad`, `soyad`, `email`, `telefon`, `durum`) üzerinden sağlandı.
 * **Reaktif Durum Yönetimi (`useState`):** Değişmezlik (immutability) kurallarına sadık kalınarak kullanıcı listesi dinamik state'e bağlandı; durum tersine çevirme (toggle) ve form üzerinden yeni kayıt ekleme fonksiyonları Virtual DOM üzerinde sıfır konsol hatasıyla işletildi.
+
+### 🔹 Gün 12: Full-Stack Entegrasyon (Axios, Controlled Components, CORS ve REST Köprüsü)
+* **CORS (Cross-Origin Resource Sharing) Protokolü:** Tarayıcıların Same-Origin Policy (SOP) güvenlik kalkanı, Spring Boot katmanında `@CrossOrigin(origins = "http://localhost:5173")` anotasyonu ile Controller seviyesinde yapılandırıldı; `5173` (React/Vite) ve `8085` (Tomcat/Spring) portları arasındaki HTTP Preflight (`OPTIONS`) ve çapraz kaynak veri transferi güvence altına alındı.
+* **Axios ile Asenkron İstemci Mimarisi:** Fetch API yerine otomatik JSON serileştirme/ters-serileştirme (serialization/deserialization) ve 2xx dışı HTTP durum kodlarını doğrudan `catch` bloklarına yönlendiren Axios HTTP istemcisi entegre edildi; Oracle XE veritabanına bağlı REST uçlarına `GET` ve `POST` istekleri bağlandı.
+* **Controlled Component Form Disiplini:** Tek Yönlü Veri Akışı (Unidirectional Data Flow) standardına sadık kalınarak form alanları (`ad`, `soyad`, `email`, `telefon`) React `useState` kancasıyla kontrollü bileşenler haline getirildi; JavaScript *Computed Property Names* mantığıyla tek bir dinamik `handleInputChange` metodu üzerinden durum senkronizasyonu sağlandı.
+* **Reaktif Veri Çekimi ve Yaşam Döngüsü (`useEffect`):** Bileşenin ilk yüklenme (Mount) anında `useEffect` kancası üzerinden veritabanı kayıtları tek seferlik asenkron çağrıyla çekilerek dinamik HTML tablosuna bağlandı; ağ gecikmeleri ve olası servis kesintileri için reaktif `loading` ve `error` durum mekanizmaları kurgulandı.
+* **Koyu Tema (Dark Mode) ve Arayüz Optimizasyonu:** Kullanıcı deneyimini kurumsal seviyeye taşımak adına WCAG kontrast standartlarına uygun koyu tema mimarisi oluşturuldu; tarayıcı zorunlu kontrast (forced colors) çakışmaları `:root { color-scheme: dark; }` direktifiyle izole edildi.
 ---
 
 ## 🏗 Mimari Katmanlar ve Sınıf Hiyerarşisi
