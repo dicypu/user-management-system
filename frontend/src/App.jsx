@@ -1,20 +1,18 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import UserForm from './components/UserForm';
+import UserList from './components/UserList';
 
 const API_BASE_URL = 'http://localhost:8085/api/users';
 
 export default function App() {
     const [users, setUsers] = useState([]);
+    const [editingUser, setEditingUser] = useState(null);
     const [loading, setLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
 
-    const [formData, setFormData] = useState({
-        ad: '',
-        soyad: '',
-        email: '',
-        telefon: ''
-    });
-
+    // 1. GET: Kullanıcı Listesini Tazeleyen Fonksiyon
     const fetchUsers = async () => {
         setLoading(true);
         setErrorMsg('');
@@ -22,7 +20,7 @@ export default function App() {
             const response = await axios.get(API_BASE_URL);
             setUsers(response.data);
         } catch (err) {
-            setErrorMsg('Kullanıcı listesi yüklenemedi. Backend servisinin (8085) ayakta olduğundan emin olun.');
+            setErrorMsg('Kullanıcı listesi yüklenemedi. Backend servisinin ayakta olduğundan emin olun.');
         } finally {
             setLoading(false);
         }
@@ -32,49 +30,67 @@ export default function App() {
         fetchUsers();
     }, []);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    // 2. POST / PUT: Ekleme veya Güncelleme İşlemi
+    const handleFormSubmit = async (formData) => {
+        setLoading(true);
         setErrorMsg('');
+        setSuccessMsg('');
 
         try {
-            const response = await axios.post(API_BASE_URL, formData);
-            setUsers(prev => [...prev, response.data]);
-            setFormData({ ad: '', soyad: '', email: '', telefon: '' });
+            if (editingUser) {
+                // PUT İsteği: Güncelleme
+                await axios.put(`${API_BASE_URL}/${editingUser.id}`, formData);
+                setSuccessMsg(`#${editingUser.id} numaralı kullanıcı başarıyla güncellendi.`);
+                setEditingUser(null);
+            } else {
+                // POST İsteği: Yeni Kayıt
+                await axios.post(API_BASE_URL, formData);
+                setSuccessMsg('Yeni kullanıcı başarıyla veritabanına kaydedildi.');
+            }
+
+            // Her işlemden sonra listeyi otomatik yenile
+            await fetchUsers();
         } catch (err) {
             if (err.response && err.response.data) {
                 const backendHata = typeof err.response.data === 'object'
                     ? JSON.stringify(err.response.data)
                     : err.response.data;
-                setErrorMsg(`Kayıt Başarısız (HTTP ${err.response.status}): ${backendHata}`);
+                setErrorMsg(`İşlem Başarısız (HTTP ${err.response.status}): ${backendHata}`);
             } else {
-                setErrorMsg('Sunucuya erişilemiyor (Bağlantı reddedildi veya CORS engeli).');
+                setErrorMsg('Sunucuya erişilemiyor.');
             }
+        } finally {
+            setLoading(false);
         }
     };
 
-    // Karanlık Mod Input Stili
-    const inputStyle = {
-        padding: '12px 14px',
-        backgroundColor: '#0b0f17',
-        color: '#f8fafc',
-        border: '1px solid #334155',
-        borderRadius: '8px',
-        fontSize: '14px',
-        outline: 'none',
-        width: '100%'
+    // 3. DELETE: Kullanıcı Silme İşlemi
+    const handleDeleteUser = async (id) => {
+        setLoading(true);
+        setErrorMsg('');
+        setSuccessMsg('');
+
+        try {
+            await axios.delete(`${API_BASE_URL}/${id}`);
+            setSuccessMsg(`#${id} numaralı kullanıcı veritabanından silindi.`);
+
+            // Eğer silinen kullanıcı o an düzenleme modundaysa modu kapat
+            if (editingUser && editingUser.id === id) {
+                setEditingUser(null);
+            }
+
+            // Listeyi otomatik yenile
+            await fetchUsers();
+        } catch (err) {
+            setErrorMsg(`Silme işlemi başarısız oldu: ${err.message}`);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <div style={{ minHeight: '100vh', backgroundColor: '#0b0f17', padding: '40px 20px', color: '#f8fafc' }}>
-            <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
 
                 {/* Başlık Alanı */}
                 <header style={{ borderBottom: '1px solid #1e293b', paddingBottom: '20px', marginBottom: '28px' }}>
@@ -82,11 +98,27 @@ export default function App() {
                         THINX Kullanıcı Yönetim Paneli
                     </h1>
                     <p style={{ margin: '8px 0 0 0', color: '#94a3b8', fontSize: '15px' }}>
-                        Gün 12: Controlled Component, Axios, useEffect ve CORS Entegrasyonu
+                        Gün 13: Modüler CRUD Mimarisi (Bileşen Ayrımı, PUT Güncelleme, Confirm ile DELETE)
                     </p>
                 </header>
 
-                {/* Hata Bildirimi (Karanlık Kırmızı Panel) */}
+                {/* Başarı Bildirimi */}
+                {successMsg && (
+                    <div style={{
+                        padding: '14px 18px',
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        border: '1px solid #10b981',
+                        color: '#6ee7b7',
+                        borderRadius: '8px',
+                        marginBottom: '20px',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                    }}>
+                        {successMsg}
+                    </div>
+                )}
+
+                {/* Hata Bildirimi */}
                 {errorMsg && (
                     <div style={{
                         padding: '14px 18px',
@@ -94,7 +126,7 @@ export default function App() {
                         border: '1px solid #ef4444',
                         color: '#fca5a5',
                         borderRadius: '8px',
-                        marginBottom: '24px',
+                        marginBottom: '20px',
                         fontSize: '14px',
                         fontWeight: '500'
                     }}>
@@ -102,164 +134,22 @@ export default function App() {
                     </div>
                 )}
 
-                {/* Yeni Kullanıcı Form Kartı */}
-                <section style={{
-                    backgroundColor: '#161f30',
-                    padding: '24px',
-                    borderRadius: '12px',
-                    border: '1px solid #1e293b',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)',
-                    marginBottom: '32px'
-                }}>
-                    <h2 style={{ margin: '0 0 20px 0', color: '#f1f5f9', fontSize: '18px', fontWeight: '600' }}>
-                        Yeni Kullanıcı Kaydı
-                    </h2>
-                    <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8' }}>Ad *</label>
-                            <input
-                                type="text"
-                                name="ad"
-                                placeholder="Örn: Emirhan"
-                                value={formData.ad}
-                                onChange={handleInputChange}
-                                required
-                                style={inputStyle}
-                            />
-                        </div>
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8' }}>Soyad *</label>
-                            <input
-                                type="text"
-                                name="soyad"
-                                placeholder="Örn: Yavuz"
-                                value={formData.soyad}
-                                onChange={handleInputChange}
-                                required
-                                style={inputStyle}
-                            />
-                        </div>
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8' }}>E-posta *</label>
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="ornek@thinx.com"
-                                value={formData.email}
-                                onChange={handleInputChange}
-                                required
-                                style={inputStyle}
-                            />
-                        </div>
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8' }}>Telefon</label>
-                            <input
-                                type="text"
-                                name="telefon"
-                                placeholder="+905551234567"
-                                value={formData.telefon}
-                                onChange={handleInputChange}
-                                style={inputStyle}
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            style={{
-                                gridColumn: '1 / -1',
-                                padding: '12px',
-                                backgroundColor: '#0284c7',
-                                color: '#ffffff',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontWeight: '600',
-                                fontSize: '15px',
-                                cursor: 'pointer',
-                                marginTop: '8px'
-                            }}
-                        >
-                            Veritabanına Kaydet (POST)
-                        </button>
-                    </form>
-                </section>
+                {/* 1. Form Bileşeni */}
+                <UserForm
+                    onSubmit={handleFormSubmit}
+                    editingUser={editingUser}
+                    onCancelEdit={() => setEditingUser(null)}
+                    loading={loading}
+                />
 
-                {/* Tablo Kartı */}
-                <section style={{
-                    backgroundColor: '#161f30',
-                    padding: '24px',
-                    borderRadius: '12px',
-                    border: '1px solid #1e293b',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)'
-                }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                        <h2 style={{ margin: 0, color: '#f1f5f9', fontSize: '18px', fontWeight: '600' }}>
-                            Kullanıcı Listesi ({users.length})
-                        </h2>
-                        <button
-                            onClick={fetchUsers}
-                            disabled={loading}
-                            style={{
-                                padding: '8px 16px',
-                                backgroundColor: '#1e293b',
-                                color: '#cbd5e1',
-                                border: '1px solid #334155',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                fontWeight: '500',
-                                fontSize: '13px'
-                            }}
-                        >
-                            {loading ? 'Yenileniyor...' : 'Listeyi Yenile'}
-                        </button>
-                    </div>
-
-                    {loading && users.length === 0 ? (
-                        <p style={{ color: '#94a3b8', textAlign: 'center', padding: '24px 0' }}>Oracle XE üzerinden veriler çekiliyor...</p>
-                    ) : (
-                        <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
-                                <thead>
-                                <tr style={{ backgroundColor: '#0b0f17', borderBottom: '1px solid #334155' }}>
-                                    <th style={{ padding: '12px', color: '#94a3b8', fontWeight: '600' }}>ID</th>
-                                    <th style={{ padding: '12px', color: '#94a3b8', fontWeight: '600' }}>Ad Soyad</th>
-                                    <th style={{ padding: '12px', color: '#94a3b8', fontWeight: '600' }}>E-posta</th>
-                                    <th style={{ padding: '12px', color: '#94a3b8', fontWeight: '600' }}>Telefon</th>
-                                    <th style={{ padding: '12px', color: '#94a3b8', fontWeight: '600' }}>Durum</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {users.map((user) => (
-                                    <tr key={user.id} style={{ borderBottom: '1px solid #1e293b' }}>
-                                        <td style={{ padding: '14px 12px', color: '#64748b' }}>#{user.id}</td>
-                                        <td style={{ padding: '14px 12px', fontWeight: '500', color: '#f8fafc' }}>{user.ad} {user.soyad}</td>
-                                        <td style={{ padding: '14px 12px', color: '#cbd5e1' }}>{user.email}</td>
-                                        <td style={{ padding: '14px 12px', color: '#94a3b8' }}>{user.telefon || '-'}</td>
-                                        <td style={{ padding: '14px 12px' }}>
-                        <span style={{
-                            padding: '4px 10px',
-                            borderRadius: '9999px',
-                            fontSize: '12px',
-                            fontWeight: '600',
-                            backgroundColor: user.durum ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                            color: user.durum ? '#34d399' : '#f87171',
-                            border: user.durum ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(239, 68, 68, 0.4)'
-                        }}>
-                          {user.durum ? 'AKTİF' : 'PASİF'}
-                        </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {users.length === 0 && (
-                                    <tr>
-                                        <td colSpan="5" style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>
-                                            Veritabanında henüz kayıtlı kullanıcı bulunmuyor.
-                                        </td>
-                                    </tr>
-                                )}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
-                </section>
+                {/* 2. Liste / Tablo Bileşeni */}
+                <UserList
+                    users={users}
+                    loading={loading}
+                    onEdit={(user) => setEditingUser(user)}
+                    onDelete={handleDeleteUser}
+                    onRefresh={fetchUsers}
+                />
 
             </div>
         </div>

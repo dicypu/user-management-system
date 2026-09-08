@@ -92,6 +92,12 @@ Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID 
 * **Controlled Component Form Disiplini:** Tek Yönlü Veri Akışı (Unidirectional Data Flow) standardına sadık kalınarak form alanları (`ad`, `soyad`, `email`, `telefon`) React `useState` kancasıyla kontrollü bileşenler haline getirildi; JavaScript *Computed Property Names* mantığıyla tek bir dinamik `handleInputChange` metodu üzerinden durum senkronizasyonu sağlandı.
 * **Reaktif Veri Çekimi ve Yaşam Döngüsü (`useEffect`):** Bileşenin ilk yüklenme (Mount) anında `useEffect` kancası üzerinden veritabanı kayıtları tek seferlik asenkron çağrıyla çekilerek dinamik HTML tablosuna bağlandı; ağ gecikmeleri ve olası servis kesintileri için reaktif `loading` ve `error` durum mekanizmaları kurgulandı.
 * **Koyu Tema (Dark Mode) ve Arayüz Optimizasyonu:** Kullanıcı deneyimini kurumsal seviyeye taşımak adına WCAG kontrast standartlarına uygun koyu tema mimarisi oluşturuldu; tarayıcı zorunlu kontrast (forced colors) çakışmaları `:root { color-scheme: dark; }` direktifiyle izole edildi.
+
+### 🔹 Gün 13: Modüler CRUD Mimarisi (Bileşen Ayrıştırma, State ile Edit Modu ve Yaşam Döngüsü)
+* **Bileşen Tabanlı Mimari (Component Decomposition):** Tek sorumluluk prensibine (SRP) uygun olarak `App.jsx` içerisindeki monolitik yapı parçalandı; form mantığı `UserForm.jsx`, tablo ve eylem butonları `UserList.jsx`, veri ve durum orkestrasyonu ise container bileşen olarak `App.jsx` üzerine devredildi.
+* **Seçili Durum (Edit Mode) Yönetimi:** Düzenleme akışı `editingUser` state'i üzerinden merkezi olarak kurgulandı; `UserList` bileşeninden tetiklenen düzenleme eylemi formu doldurarak `POST` modundan dinamik `PUT` moduna geçiş sağladı ve iptal mekanizmasıyla form temizleme izolasyonu korundu.
+* **Onay Mekanizmalı Silme Akışı (DELETE):** İstem dışı veri kayıplarını engellemek amacıyla `window.confirm` kalkanı ile iki aşamalı doğrulama kuruldu; onaylanan kayıtlar REST API üzerinden `DELETE /api/users/{id}` ucu ile Oracle XE veritabanından kalıcı olarak temizlendi.
+* **Reaktif Liste Senkronizasyonu:** `POST`, `PUT` ve `DELETE` operasyonlarının ardından arayüzün veritabanı ile tam tutarlılıkta kalması adına asenkron `fetchUsers()` tetikleyicisi işletilerek tablo DOM üzerinde kesintisiz güncel tutuldu.
 ---
 
 ## 🏗 Mimari Katmanlar ve Sınıf Hiyerarşisi
