@@ -190,18 +190,38 @@ Konsolda `Tomcat started on port 8085 (http)` ve `Started UserManagementSystemAp
 
 ---
 
-### 5. Adım: Swagger UI Canlı Dokümantasyon ve Test
+### 5. Adım: Frontend (React / Vite) Arayüzünü Başlatma
 
-Uygulama ayağa kalktığında tarayıcınızdan aşağıdaki adreslere erişebilirsiniz:
+Ayrı bir terminal penceresinde `frontend` dizinine geçip geliştirme sunucusunu başlatın:
 
+```powershell
+# Frontend dizinine gir
+cd frontend
+
+# Bağımlılıkları kur (İlk kurulumda)
+npm install
+
+# Geliştirme sunucusunu çalıştır
+npm run dev
+```
+
+Konsolda `VITE ready in ... ms` ve yerel adres çıktısı görüldüğünde ön yüz hazırdır.
+
+---
+
+### 6. Adım: Servis Arayüzlerine Erişim ve Canlı Dokümantasyon
+
+Tüm servisler ayaktayken tarayıcınızdan şu panellere doğrudan erişebilirsiniz:
+
+* **Kullanıcı Paneli (React UI):** [http://localhost:5173/](http://localhost:5173/)
 * **Swagger UI Test Paneli:** [http://localhost:8085/swagger-ui/index.html](http://localhost:8085/swagger-ui/index.html)
 * **Ham OpenAPI Şeması (JSON):** [http://localhost:8085/v3/api-docs](http://localhost:8085/v3/api-docs)
 
 ---
 
-## 🧪 Uçtan Uca Doğrulama ve Test Komutları
+## 🧪 Uçtan Uca API Doğrulama ve Test Komutları (cURL)
 
-API davranışlarını ve veritabanı yansımasını terminalden test etmek için aşağıdaki komutları kullanabilirsiniz:
+Backend REST servisinin HTTP durum kodlarını ve Bean Validation kalkanlarını doğrulamak için terminalden şu testleri koşturun:
 
 ### 1. Başarılı Kullanıcı Ekleme (`201 Created`):
 ```bash
@@ -254,6 +274,41 @@ curl -X PUT http://localhost:8085/api/users/1 \
 curl -X DELETE http://localhost:8085/api/users/1
 ```
 
+---
+
+### 7. Adım: Veritabanı Doğrulama (Docker `sqlplus`)
+
+Uygulamanın Oracle XE üzerinde fiziksel tablo ve kayıt oluşturduğunu doğrulamak için konteyner CLI aracını çalıştırın:
+
+```bash
+docker exec -it thinx-oracle-xe sqlplus system/oracle@XEPDB1
+```
+
+SQL satırında doğrulama sorgularını işletin:
+```sql
+-- Tablonun fiziksel yapısını denetle
+DESC users;
+
+-- Eklenen kullanıcıları listele
+SELECT id, ad, soyad, email, durum FROM users;
+
+-- Çıkış
+EXIT;
+```
+
+---
+
+### 8. Adım: Konteyneri Durdurma ve Temizleme (Opsiyonel)
+
+Çalışma tamamlandığında sistem kaynaklarını serbest bırakmak için:
+
+```bash
+# Konteyneri durdurma
+docker stop thinx-oracle-xe
+
+# Konteyneri tamamen kaldırma (Gerektiğinde)
+docker rm thinx-oracle-xe
+```
 ---
 
 ### 6. Adım: Veritabanı Doğrulama (Docker `sqlplus`)
