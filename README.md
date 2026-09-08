@@ -79,6 +79,12 @@ Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID 
 * **Merkezi Hata Yönetimi:** `@RestControllerAdvice` ile `MethodArgumentNotValidException` ve `UserNotFoundException` yakalanarak anlamlı JSON hata yanıtları üretildi.
 * **Swagger/OpenAPI 3 Entegrasyonu:** `springdoc-openapi-starter-webmvc-ui` kütüphanesi ile API kontratı belgelendi; `/swagger-ui/index.html` üzerinden interaktif dokümantasyon sağlandı.
 
+
+### 🔹 Gün 11: Frontend Mimarisine Giriş (React 18, Vite, Bileşenler ve State Yönetimi)
+* **Vite & Modern SPA İskeleti:** Hızlı derleme ve Native ESM desteği sunan Vite altyapısıyla React 18 projesi ayağa kaldırıldı; monorepo mimarisi dahilinde `/frontend` dizinine konumlandırıldı.
+* **Fonksiyonel Bileşen (Function Component) Mimarisi:** Tek sorumluluk prensibine (SRP) sadık kalınarak `UserCard` bileşeni geliştirildi; arayüz mantığı modüler parçalara ayrıştırıldı.
+* **Props ile Tek Yönlü Veri Akışı (Unidirectional Data Flow):** Üst bileşenden (`App.jsx`) alt bileşene (`UserCard.jsx`) veri aktarımı salt okunur (read-only) `props` (`ad`, `soyad`, `email`, `telefon`, `durum`) üzerinden sağlandı.
+* **Reaktif Durum Yönetimi (`useState`):** Değişmezlik (immutability) kurallarına sadık kalınarak kullanıcı listesi dinamik state'e bağlandı; durum tersine çevirme (toggle) ve form üzerinden yeni kayıt ekleme fonksiyonları Virtual DOM üzerinde sıfır konsol hatasıyla işletildi.
 ---
 
 ## 🏗 Mimari Katmanlar ve Sınıf Hiyerarşisi
