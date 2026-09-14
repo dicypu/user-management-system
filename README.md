@@ -98,6 +98,13 @@ Bu proje, **THINX Yazılım Stajı Programı** kapsamında geliştirilen; SOLID 
 * **Seçili Durum (Edit Mode) Yönetimi:** Düzenleme akışı `editingUser` state'i üzerinden merkezi olarak kurgulandı; `UserList` bileşeninden tetiklenen düzenleme eylemi formu doldurarak `POST` modundan dinamik `PUT` moduna geçiş sağladı ve iptal mekanizmasıyla form temizleme izolasyonu korundu.
 * **Onay Mekanizmalı Silme Akışı (DELETE):** İstem dışı veri kayıplarını engellemek amacıyla `window.confirm` kalkanı ile iki aşamalı doğrulama kuruldu; onaylanan kayıtlar REST API üzerinden `DELETE /api/users/{id}` ucu ile Oracle XE veritabanından kalıcı olarak temizlendi.
 * **Reaktif Liste Senkronizasyonu:** `POST`, `PUT` ve `DELETE` operasyonlarının ardından arayüzün veritabanı ile tam tutarlılıkta kalması adına asenkron `fetchUsers()` tetikleyicisi işletilerek tablo DOM üzerinde kesintisiz güncel tutuldu.
+
+### 🔹 Gün 14: Dağıtık Sistem Temelleri ve Konteynerizasyon (Docker & Multi-Stage Build)
+* **Monolith vs. Microservice Analizi:** Monolitik mimarinin getirdiği tek nokta arızası (SPOF), yatay ölçekleme darboğazları ve sıkı bağlılık (tight-coupling) riskleri analiz edildi; API Gateway (Spring Cloud Gateway), Service Discovery (Eureka) ve merkezi Config Server katmanlarının dağıtık topolojideki rolleri belirlendi.
+* **Çok Aşamalı Docker Derlemesi (Multi-Stage Build):** Java 21 LTS mimarisine uygun olarak derleme (`maven:3.9.6-eclipse-temurin-21`) ve çalışma (`eclipse-temurin:21-jre-jammy`) ortamları birbirinden izole edildi; nihai imaj boyutu optimize edilerek saldırı yüzeyi daraltıldı.
+* **Konteyner Güvenliği ve Yetki İzolasyonu:** Çalışma aşamasında `root` kullanıcı yerine kısıtlı sistem kullanıcısı (`appuser`) tanımlanarak konteyner kaçış (container breakout) güvenlik riskleri minimize edildi.
+* **Konteynerler Arası Ağ İletişimi (Docker Bridge Network):** `thinx-network` özel köprü ağı kurularak `thinx-backend-app` ile `thinx-oracle-xe` arasındaki haberleşme yerel DNS isim çözümlemesi üzerinden bağlandı; veritabanı bağlantısı `SPRING_DATASOURCE_URL` çevre değişkeni ile çalışma anında (runtime) dinamik olarak yapılandırıldı.
+* **Servis Ayrıştırma Mimarisi:** Mevcut monolitik kullanıcı yönetim sisteminin kurumsal ölçekte Auth/IAM, User Core, Notification ve Audit servislerine bölünme şeması tasarlandı.
 ---
 
 ## 🏗 Mimari Katmanlar ve Sınıf Hiyerarşisi

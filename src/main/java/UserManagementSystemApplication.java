@@ -3,17 +3,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-@SpringBootApplication(scanBasePackages = {
-        "controller",
-        "service",
-        "repository",
-        "entity",
-        "dto",
-        "component",
-        "config",
-        "exception",
-        "util"
-})
+@SpringBootApplication(scanBasePackages = {"Controller", "service", "repository", "config", "component"})
 @EntityScan(basePackages = "entity")
 @EnableJpaRepositories(basePackages = "repository")
 public class UserManagementSystemApplication {
