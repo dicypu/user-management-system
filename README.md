@@ -219,6 +219,18 @@ Layered Architecture) desenini benimseyen, Spring Boot 3.2.x, Spring Data JPA, O
 * **Strategy Pattern:** `NotificationStrategy` arayüzü ve `EmailNotificationStrategy` somut sınıfı oluşturuldu. `NotificationService`, Spring'in `List<NotificationStrategy>` otomatik enjeksiyonu sayesinde çalışma zamanında (runtime) kanala göre dinamik strateji seçimi yapacak esnekliğe kavuşturuldu (Open-Closed Principle).
 * **Observer Pattern (Olay Güdümlü Ayrıştırma):** `UserService` ile bildirim mantığı arasındaki doğrudan bağımlılık (Tight Coupling) kırıldı. `UserCreatedEvent` fırlatılarak, Spring'in `ApplicationEventPublisher` ve `@EventListener` mekanizmalarıyla asenkron mimarilere hazır bir gözlemci modeli (`UserEventListener`) kuruldu.
 * **Spring Dahili Kalıplarının Analizi:** IoC konteynerinin Singleton kapsamı, Transaction yönetimindeki Proxy/AOP yapısı ve `BeanFactory` düzeyindeki Factory kalıpları analiz edilerek mimariye uyarlandı.
+
+### 🔹 Gün 18: İzole Birim Testleri (Unit Testing), JUnit 5 ve Mockito
+* **Birim Test İzolasyonu (Unit vs Integration Test):** `@SpringBootTest` yükü ve canlı veritabanı bağımlılıkları tamamen saf dışı bırakıldı. `@ExtendWith(MockitoExtension.class)` kullanılarak Spring Context ayağa kaldırılmadan milisaniyeler mertebesinde koşan izole birim test mimarisi kuruldu.
+* **Mockito Bağımlılık Yönetimi (Test Doubles):** `UserRepository` ve `ApplicationEventPublisher` bileşenleri `@Mock` ile taklit edildi; `@InjectMocks` vasıtasıyla doğrudan `UserService` sınıfına enjekte edildi.
+* **Kritik İş Akışı Senaryoları:**
+  * `createUser`: Geçerli istekte nesnenin kaydedildiği ve `UserCreatedEvent` olayının fırlatıldığı (`verify`) doğrulandı.
+  * `getUserById`: Kayıt varlığında doğru DTO dönüşümü; kayıt yokluğunda ise `UserNotFoundException` fırlatıldığı (`assertThrows`) denetlendi.
+  * `updateUser`: Dinamik alan güncellemesi ve repository çağrısı doğrulandı.
+  * `deleteUser`: Var olmayan bir ID için silme operasyonunun engellendiği ve `deleteById` metodunun asla çağrılmadığı (`never()`) mühürlendi.
+* **Dizin ve Scope Ayrımı:** Test dosyalarının `src/test/java` dizininde konumlandırılması sağlanarak derleme anında test bağımlılıklarının (`spring-boot-starter-test`) üretim kodlarından kesin çizgilerle ayrışması garanti altına alındı.
+
+
 ---
 
 ## 🏗 Mimari Katmanlar ve Sınıf Hiyerarşisi
