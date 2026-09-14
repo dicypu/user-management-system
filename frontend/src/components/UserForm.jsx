@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import {useEffect, useState} from 'react';
 
 const initialFormState = {
     ad: '',
@@ -7,7 +7,7 @@ const initialFormState = {
     telefon: ''
 };
 
-export default function UserForm({ onSubmit, editingUser, onCancelEdit, loading }) {
+export default function UserForm({onSubmit, editingUser, onCancelEdit, loading}) {
     const [formData, setFormData] = useState(initialFormState);
 
     // Düzenlenecek kullanıcı değiştiğinde formu doldur veya sıfırla
@@ -25,8 +25,8 @@ export default function UserForm({ onSubmit, editingUser, onCancelEdit, loading 
     }, [editingUser]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        const {name, value} = e.target;
+        setFormData((prev) => ({...prev, [name]: value}));
     };
 
     const handleSubmit = (e) => {
@@ -54,8 +54,8 @@ export default function UserForm({ onSubmit, editingUser, onCancelEdit, loading 
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)',
             marginBottom: '32px'
         }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ margin: 0, color: '#f1f5f9', fontSize: '18px', fontWeight: '600' }}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
+                <h2 style={{margin: 0, color: '#f1f5f9', fontSize: '18px', fontWeight: '600'}}>
                     {editingUser ? `Kullanıcı Düzenle (#${editingUser.id})` : 'Yeni Kullanıcı Kaydı'}
                 </h2>
                 {editingUser && (
@@ -77,9 +77,11 @@ export default function UserForm({ onSubmit, editingUser, onCancelEdit, loading 
                 )}
             </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+            <form onSubmit={handleSubmit}
+                  style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px'}}>
                 <div>
-                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8' }}>Ad *</label>
+                    <label style={{display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8'}}>Ad
+                        *</label>
                     <input
                         type="text"
                         name="ad"
@@ -91,7 +93,8 @@ export default function UserForm({ onSubmit, editingUser, onCancelEdit, loading 
                     />
                 </div>
                 <div>
-                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8' }}>Soyad *</label>
+                    <label style={{display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8'}}>Soyad
+                        *</label>
                     <input
                         type="text"
                         name="soyad"
@@ -103,7 +106,8 @@ export default function UserForm({ onSubmit, editingUser, onCancelEdit, loading 
                     />
                 </div>
                 <div>
-                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8' }}>E-posta *</label>
+                    <label style={{display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8'}}>E-posta
+                        *</label>
                     <input
                         type="email"
                         name="email"
@@ -115,7 +119,12 @@ export default function UserForm({ onSubmit, editingUser, onCancelEdit, loading 
                     />
                 </div>
                 <div>
-                    <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', color: '#94a3b8' }}>Telefon</label>
+                    <label style={{
+                        display: 'block',
+                        marginBottom: '6px',
+                        fontSize: '13px',
+                        color: '#94a3b8'
+                    }}>Telefon</label>
                     <input
                         type="text"
                         name="telefon"

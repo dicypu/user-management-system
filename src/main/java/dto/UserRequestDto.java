@@ -5,8 +5,16 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Schema(description = "Kullanıcı Oluşturma ve Güncelleme İstek Modeli")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserRequestDto {
 
     @Schema(description = "Kullanıcının adı", example = "Emirhan")
@@ -27,24 +35,4 @@ public class UserRequestDto {
     @Schema(description = "İletişim telefon numarası", example = "+905551234567")
     @Pattern(regexp = "^\\+?[0-9]{10,15}$", message = "Telefon numarası geçerli bir uluslararası formatta olmalıdır.")
     private String telefon;
-
-    public UserRequestDto() {
-    }
-
-    public UserRequestDto(String ad, String soyad, String email, String telefon) {
-        this.ad = ad;
-        this.soyad = soyad;
-        this.email = email;
-        this.telefon = telefon;
-    }
-
-    // Getters and Setters
-    public String getAd() { return ad; }
-    public void setAd(String ad) { this.ad = ad; }
-    public String getSoyad() { return soyad; }
-    public void setSoyad(String soyad) { this.soyad = soyad; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getTelefon() { return telefon; }
-    public void setTelefon(String telefon) { this.telefon = telefon; }
 }

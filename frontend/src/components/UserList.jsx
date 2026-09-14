@@ -1,4 +1,4 @@
-export default function UserList({ users, loading, onEdit, onDelete, onRefresh }) {
+export default function UserList({users, loading, onEdit, onDelete, onRefresh}) {
     const handleDeleteClick = (user) => {
         const onay = window.confirm(`${user.ad} ${user.soyad} (#${user.id}) kullanıcısını silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`);
         if (onay) {
@@ -14,8 +14,8 @@ export default function UserList({ users, loading, onEdit, onDelete, onRefresh }
             border: '1px solid #1e293b',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.5)'
         }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                <h2 style={{ margin: 0, color: '#f1f5f9', fontSize: '18px', fontWeight: '600' }}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px'}}>
+                <h2 style={{margin: 0, color: '#f1f5f9', fontSize: '18px', fontWeight: '600'}}>
                     Kullanıcı Listesi ({users.length})
                 </h2>
                 <button
@@ -37,28 +37,39 @@ export default function UserList({ users, loading, onEdit, onDelete, onRefresh }
             </div>
 
             {loading && users.length === 0 ? (
-                <p style={{ color: '#94a3b8', textAlign: 'center', padding: '24px 0' }}>Oracle XE üzerinden veriler çekiliyor...</p>
+                <p style={{color: '#94a3b8', textAlign: 'center', padding: '24px 0'}}>Oracle XE üzerinden veriler
+                    çekiliyor...</p>
             ) : (
-                <div style={{ overflowX: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
+                <div style={{overflowX: 'auto'}}>
+                    <table style={{width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px'}}>
                         <thead>
-                        <tr style={{ backgroundColor: '#0b0f17', borderBottom: '1px solid #334155' }}>
-                            <th style={{ padding: '12px', color: '#94a3b8', fontWeight: '600' }}>ID</th>
-                            <th style={{ padding: '12px', color: '#94a3b8', fontWeight: '600' }}>Ad Soyad</th>
-                            <th style={{ padding: '12px', color: '#94a3b8', fontWeight: '600' }}>E-posta</th>
-                            <th style={{ padding: '12px', color: '#94a3b8', fontWeight: '600' }}>Telefon</th>
-                            <th style={{ padding: '12px', color: '#94a3b8', fontWeight: '600' }}>Durum</th>
-                            <th style={{ padding: '12px', color: '#94a3b8', fontWeight: '600', textAlign: 'right' }}>İşlemler</th>
+                        <tr style={{backgroundColor: '#0b0f17', borderBottom: '1px solid #334155'}}>
+                            <th style={{padding: '12px', color: '#94a3b8', fontWeight: '600'}}>ID</th>
+                            <th style={{padding: '12px', color: '#94a3b8', fontWeight: '600'}}>Ad Soyad</th>
+                            <th style={{padding: '12px', color: '#94a3b8', fontWeight: '600'}}>E-posta</th>
+                            <th style={{padding: '12px', color: '#94a3b8', fontWeight: '600'}}>Telefon</th>
+                            <th style={{padding: '12px', color: '#94a3b8', fontWeight: '600'}}>Durum</th>
+                            <th style={{
+                                padding: '12px',
+                                color: '#94a3b8',
+                                fontWeight: '600',
+                                textAlign: 'right'
+                            }}>İşlemler
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
                         {users.map((user) => (
-                            <tr key={user.id} style={{ borderBottom: '1px solid #1e293b' }}>
-                                <td style={{ padding: '14px 12px', color: '#64748b' }}>#{user.id}</td>
-                                <td style={{ padding: '14px 12px', fontWeight: '500', color: '#f8fafc' }}>{user.ad} {user.soyad}</td>
-                                <td style={{ padding: '14px 12px', color: '#cbd5e1' }}>{user.email}</td>
-                                <td style={{ padding: '14px 12px', color: '#94a3b8' }}>{user.telefon || '-'}</td>
-                                <td style={{ padding: '14px 12px' }}>
+                            <tr key={user.id} style={{borderBottom: '1px solid #1e293b'}}>
+                                <td style={{padding: '14px 12px', color: '#64748b'}}>#{user.id}</td>
+                                <td style={{
+                                    padding: '14px 12px',
+                                    fontWeight: '500',
+                                    color: '#f8fafc'
+                                }}>{user.ad} {user.soyad}</td>
+                                <td style={{padding: '14px 12px', color: '#cbd5e1'}}>{user.email}</td>
+                                <td style={{padding: '14px 12px', color: '#94a3b8'}}>{user.telefon || '-'}</td>
+                                <td style={{padding: '14px 12px'}}>
                     <span style={{
                         padding: '4px 10px',
                         borderRadius: '9999px',
@@ -71,7 +82,7 @@ export default function UserList({ users, loading, onEdit, onDelete, onRefresh }
                       {user.durum ? 'AKTİF' : 'PASİF'}
                     </span>
                                 </td>
-                                <td style={{ padding: '14px 12px', textAlign: 'right' }}>
+                                <td style={{padding: '14px 12px', textAlign: 'right'}}>
                                     <button
                                         onClick={() => onEdit(user)}
                                         style={{
@@ -108,7 +119,7 @@ export default function UserList({ users, loading, onEdit, onDelete, onRefresh }
                         ))}
                         {users.length === 0 && (
                             <tr>
-                                <td colSpan="6" style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>
+                                <td colSpan="6" style={{padding: '32px', textAlign: 'center', color: '#64748b'}}>
                                     Veritabanında kayıtlı kullanıcı bulunamadı.
                                 </td>
                             </tr>

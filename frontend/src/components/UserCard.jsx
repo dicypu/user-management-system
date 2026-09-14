@@ -1,4 +1,4 @@
-export default function UserCard({ ad, soyad, email, telefon, durum }) {
+export default function UserCard({ad, soyad, email, telefon, durum}) {
     return (
         <div style={{
             border: '1px solid #cbd5e1',
@@ -9,8 +9,8 @@ export default function UserCard({ ad, soyad, email, telefon, durum }) {
             boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
             maxWidth: '380px'
         }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <h3 style={{ margin: 0, color: '#0f172a', fontSize: '18px' }}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
+                <h3 style={{margin: 0, color: '#0f172a', fontSize: '18px'}}>
                     {ad} {soyad}
                 </h3>
                 <span style={{
@@ -25,10 +25,10 @@ export default function UserCard({ ad, soyad, email, telefon, durum }) {
         </span>
             </div>
 
-            <p style={{ margin: '4px 0', color: '#475569', fontSize: '14px' }}>
+            <p style={{margin: '4px 0', color: '#475569', fontSize: '14px'}}>
                 <strong>E-posta:</strong> {email}
             </p>
-            <p style={{ margin: '4px 0', color: '#475569', fontSize: '14px' }}>
+            <p style={{margin: '4px 0', color: '#475569', fontSize: '14px'}}>
                 <strong>Telefon:</strong> {telefon || 'Belirtilmedi'}
             </p>
         </div>

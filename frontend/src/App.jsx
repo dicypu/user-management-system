@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import axios from 'axios';
 import UserForm from './components/UserForm';
 import UserList from './components/UserList';
@@ -89,15 +89,21 @@ export default function App() {
     };
 
     return (
-        <div style={{ minHeight: '100vh', backgroundColor: '#0b0f17', padding: '40px 20px', color: '#f8fafc' }}>
-            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <div style={{minHeight: '100vh', backgroundColor: '#0b0f17', padding: '40px 20px', color: '#f8fafc'}}>
+            <div style={{maxWidth: '1000px', margin: '0 auto'}}>
 
                 {/* Başlık Alanı */}
-                <header style={{ borderBottom: '1px solid #1e293b', paddingBottom: '20px', marginBottom: '28px' }}>
-                    <h1 style={{ margin: 0, color: '#f8fafc', fontSize: '28px', fontWeight: '700', letterSpacing: '-0.5px' }}>
+                <header style={{borderBottom: '1px solid #1e293b', paddingBottom: '20px', marginBottom: '28px'}}>
+                    <h1 style={{
+                        margin: 0,
+                        color: '#f8fafc',
+                        fontSize: '28px',
+                        fontWeight: '700',
+                        letterSpacing: '-0.5px'
+                    }}>
                         THINX Kullanıcı Yönetim Paneli
                     </h1>
-                    <p style={{ margin: '8px 0 0 0', color: '#94a3b8', fontSize: '15px' }}>
+                    <p style={{margin: '8px 0 0 0', color: '#94a3b8', fontSize: '15px'}}>
                         Gün 13: Modüler CRUD Mimarisi (Bileşen Ayrımı, PUT Güncelleme, Confirm ile DELETE)
                     </p>
                 </header>
