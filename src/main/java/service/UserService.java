@@ -3,15 +3,16 @@ package service;
 import dto.UserRequestDto;
 import dto.UserResponseDto;
 import entity.UserEntity;
+import event.UserCreatedEvent;
 import exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import repository.UserRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public UserResponseDto createUser(UserRequestDto dto) {
@@ -34,6 +36,10 @@ public class UserService {
 
         UserEntity saved = userRepository.save(entity);
         log.info("Kullanıcı başarıyla veritabanına mühürlendi. Atanan ID: {}", saved.getId());
+
+        // [OBSERVER PATTERN] Olayı fırlat: UserService kimin dinlediğini bilmez (Gevşek Bağlılık)
+        eventPublisher.publishEvent(new UserCreatedEvent(this, saved));
+
         return mapToDto(saved);
     }
 
@@ -45,15 +51,13 @@ public class UserService {
 
         return users.stream()
                 .map(this::mapToDto)
-                .collect(Collectors.toList());
+                .toList(); // Java 16+ standardı: Collectors.toList() hamallığı temizlendi
     }
 
     @Transactional(readOnly = true)
     public UserResponseDto getUserById(Long id) {
         log.debug("Kullanıcı sorgulanıyor. ID: {}", id);
-        UserEntity entity = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("ID'si " + id + " olan kullanıcı bulunamadı."));
-        return mapToDto(entity);
+        return mapToDto(findUserByIdOrThrow(id));
     }
 
     @Transactional
@@ -66,6 +70,18 @@ public class UserService {
         return mapToDto(savedUser);
     }
 
+    @Transactional
+    public void deleteUser(Long id) {
+        log.warn("Kullanıcı silme operasyonu tetiklendi! Hedef ID: {}", id);
+        if (!userRepository.existsById(id)) {
+            throw new UserNotFoundException("Silinecek kullanıcı bulunamadı. ID: " + id);
+        }
+        userRepository.deleteById(id);
+        log.info("Kullanıcı veritabanından kalıcı olarak silindi. ID: {}", id);
+    }
+
+    // --- Private SRP Helper Metotları ---
+
     private UserEntity findUserByIdOrThrow(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("ID'si " + id + " olan kullanıcı bulunamadı."));
@@ -76,16 +92,6 @@ public class UserService {
         entity.setSoyad(dto.getSoyad());
         entity.setEmail(dto.getEmail());
         entity.setTelefon(dto.getTelefon());
-    }
-
-    @Transactional
-    public void deleteUser(Long id) {
-        log.warn("Kullanıcı silme operasyonu tetiklendi! Hedef ID: {}", id);
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("Silinecek kullanıcı bulunamadı. ID: " + id);
-        }
-        userRepository.deleteById(id);
-        log.info("Kullanıcı veritabanından kalıcı olarak silindi. ID: {}", id);
     }
 
     private UserResponseDto mapToDto(UserEntity entity) {

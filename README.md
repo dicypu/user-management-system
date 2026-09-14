@@ -213,6 +213,12 @@ Layered Architecture) desenini benimseyen, Spring Boot 3.2.x, Spring Data JPA, O
 * **Java Adlandırma Konvansiyonu (Naming Conventions):** Java ve Spring Boot standartlarına aykırı olan büyük harfli paket isimlendirmesi (`package Controller;`) Git seviyesinde iki aşamalı olarak küçük harfe (`package controller;`) çekildi; Windows dosya sisteminin case-insensitive yapısından kaynaklanabilecek çapraz platform derleme riskleri bertaraf edildi.
 * **Tek Sorumluluk Prensibi (SRP & SLAP):** `UserService` sınıfı monolitik metot yapısından arındırıldı. Yüksek seviyeli iş akışları ile düşük seviyeli implementasyon detayları (veritabanı varlık doğrulaması, DTO mapleme, alan güncellemeleri) private yardımcı metotlara (`findUserByIdOrThrow`, `validateUserExists`, `updateUserFields`, `buildNewUserEntity`, `mapToDto`) bölünerek Single Level of Abstraction Principle (SLAP) uygulandı.
 * **Statik Kod Hijyeni ve Format:** Kullanılmayan import satırları (Unused Imports) temizlendi, girintiler ve kod blokları standart Java formatına hizalanarak bilişsel karmaşıklık (Cognitive Complexity) asgariye indirildi.
+
+### 🔹 Gün 17: Tasarım Kalıpları (GoF Patterns) ve Olay Güdümlü Spring Mimarisi
+* **Builder Pattern:** DTO ve JPA Entity katmanlarında Lombok `@Builder` ile nesne inşası standartlaştırıldı; teleskopik yapıcı metot kirliliği ve nesne durumu tutarsızlıkları engellendi.
+* **Strategy Pattern:** `NotificationStrategy` arayüzü ve `EmailNotificationStrategy` somut sınıfı oluşturuldu. `NotificationService`, Spring'in `List<NotificationStrategy>` otomatik enjeksiyonu sayesinde çalışma zamanında (runtime) kanala göre dinamik strateji seçimi yapacak esnekliğe kavuşturuldu (Open-Closed Principle).
+* **Observer Pattern (Olay Güdümlü Ayrıştırma):** `UserService` ile bildirim mantığı arasındaki doğrudan bağımlılık (Tight Coupling) kırıldı. `UserCreatedEvent` fırlatılarak, Spring'in `ApplicationEventPublisher` ve `@EventListener` mekanizmalarıyla asenkron mimarilere hazır bir gözlemci modeli (`UserEventListener`) kuruldu.
+* **Spring Dahili Kalıplarının Analizi:** IoC konteynerinin Singleton kapsamı, Transaction yönetimindeki Proxy/AOP yapısı ve `BeanFactory` düzeyindeki Factory kalıpları analiz edilerek mimariye uyarlandı.
 ---
 
 ## 🏗 Mimari Katmanlar ve Sınıf Hiyerarşisi
